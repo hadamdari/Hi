@@ -1,0 +1,130 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f5f6fa;
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  background: #f3f2f1;
+  border-right: 1px solid #e1dfdd;
+  padding: 24px 12px;
+  box-sizing: border-box;
+}
+
+.sidebar h2 {
+  margin-top: 0;
+  font-size: 1.3em;
+  color: #323130;
+}
+
+#add-note-btn {
+  width: 100%;
+  padding: 8px 0;
+  margin-bottom: 18px;
+  background: #e5e5e5;
+  border: none;
+  border-radius: 6px;
+  font-size: 1em;
+  cursor: pointer;
+  color: #323130;
+  transition: background 0.2s;
+}
+#add-note-btn:hover {
+  background: #d0d0d0;
+}
+
+#note-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#note-list li {
+  padding: 8px 6px;
+  margin-bottom: 6px;
+  background: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.98em;
+  color: #323130;
+  border: 1px solid #e1dfdd;
+  transition: background 0.2s;
+}
+#note-list li.active,
+#note-list li:hover {
+  background: #e5e5e5;
+}
+
+main {
+  flex: 1;
+  padding: 36px 40px;
+  box-sizing: border-box;
+}
+
+.note-input-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+#note-input {
+  flex: 1;
+  min-height: 48px;
+  font-size: 1em;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #e1dfdd;
+  resize: vertical;
+  background: #fff;
+}
+
+#save-note-btn {
+  padding: 10px 22px;
+  background: #6c63ff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#save-note-btn:hover {
+  background: #554ee2;
+}
+
+#notes-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.note-box {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(60,60,60,0.07);
+  padding: 18px 18px 14px 18px;
+  min-width: 220px;
+  max-width: 320px;
+  min-height: 80px;
+  position: relative;
+  border: 1px solid #e1dfdd;
+  word-break: break-word;
+}
+
+.note-box .delete-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.note-box .delete-btn:hover {
+  color: #d13438;
+}

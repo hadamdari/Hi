@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>메모장</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f6fa;
+      display: flex;
+      height: 100vh;
+    }
+    .sidebar {
+      width: 220px;
+      background: #f3f2f1;
+      border-right: 1px solid #e1dfdd;
+      padding: 24px 12px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .sidebar h2 {
+      margin: 0 0 18px 0;
+      font-size: 1.25em;
+      color: #323130;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .folder-list, .subfolder-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 24px 0;
+    }
+    .folder-list li, .subfolder-list li {
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      background: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1.05em;
+      color: #323130;
+      border: 1px solid #e1dfdd;
+      transition: background 0.2s, border 0.2s;
+      font-weight: 500;
+    }
+    .folder-list li.active,
+    .folder-list li:hover,
+    .subfolder-list li.active,
+    .subfolder-list li:hover {
+      background: #e5e5e5;
+      border: 1.5px solid #6c63ff;
+    }
+    .subfolder-list {
+      margin-left: 16px;
+      margin-bottom: 18px;
+    }
+    main {
+      flex: 1;
+      padding: 40px 48px;
+      box-sizing: border-box;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+    .note-input-container {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+      align-items: flex-start;
+    }
+    #note-input {
+      flex: 1;
+      min-height: 56px;
+      font-size: 1.08em;
+      padding: 12px;
+      border-radius: 7px;
+      border: 1.5px solid #e1dfdd;
+      resize: vertical;
+      background: #f9f9fb;
+      box-shadow: 0 1px 2px rgba(60,60,60,0.04);
+      font-family: inherit;
+      transition: border 0.2s;
+    }
+    #note-input:focus {
+      border: 1.5px solid #6c63ff;
+      outline: none;
+      background: #fff;
+    }
+    #save-note-btn {
+      padding: 12px 26px;
+      background: #6c63ff;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-size: 1.08em;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(60,60,60,0.04);
+    }
+    #save-note-btn:hover {
+      background: #554ee2;
+    }
+    #notes-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      align-items: flex-start;
+      width: 100%;
+    }
+    .note-box {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(60,60,60,0.10);
+      padding: 22px 22px 18px 22px;
+      min-width: 260px;
+      max-width: 340px;
+      min-height: 90px;
+      position: relative;
+      border: 1.5px solid #e1dfdd;
+      word-break: break-word;
+      transition: border 0.2s, box-shadow 0.2s;
+      margin-bottom: 8px;
+    }
+    .note-box:hover {
+      border: 1.5px solid #6c63ff;
+      box-shadow: 0 4px 16px rgba(108,99,255,0.10);
+    }
+    .note-box .delete-btn {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: #888;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: color 0.2s, background 0.2s;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .note-box .delete-btn:hover {
+      color: #fff;
+      background: #d13438;
+    }
+    .note-box div {
+      font-size: 1.05em;
+      line-height: 1.7;
+      color: #22223b;
+      font-family: inherit;
+      word-break: break-word;
+      white-space: pre-line;
+    }
+    @media (max-width: 900px) {
+      main {
+        padding: 20px 8px;
+      }
+      .sidebar {
+        width: 120px;
+        padding: 10px 2px 0 2px;
+      }
+      .note-box {
+        min-width: 140px;
+        max-width: 98vw;
+      }
+    }
+    .month-icon-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 18px;
+      margin-left: 0;
+    }
+    .month-icon-list li {
+      background: #e5e5e5;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1em;
+      color: #323130;
+      cursor: pointer;
+      border: 1.5px solid #e1dfdd;
+      transition: background 0.2s, border 0.2s;
+      list-style: none;
+      user-select: none;
+    }
+    .month-icon-list li.active,
+    .month-icon-list li:hover {
+      background: #6c63ff;
+      color: #fff;
+      border: 1.5px solid #6c63ff;
+    }
+    #month-calendar-container {
+      margin: 0 auto;
+      max-width: 500px;
+      width: 100%;
+      padding: 24px 0;
+    }
+    .calendar-title {
+      text-align: center;
+      font-size: 1.3em;
+      font-weight: bold;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+    .calendar-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(60,60,60,0.08);
+    }
+    .calendar-table th, .calendar-table td {
+      border: 1px solid #d1d1d1;
+      width: 14.2%;
+      height: 38px;
+      text-align: center;
+      font-size: 1em;
+    }
+    .calendar-table th {
+      background: #f3f2f1;
+      font-weight: 600;
+      color: #2d2d2d;
+    }
+    .calendar-table td {
+      background: #fff;
+      color: #222;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>메모장</h2>
+    <ul class="folder-list" id="folder-list">
+      <li data-folder="important" class="active">중요메모</li>
+      <li data-folder="month" id="month-folder">한달 일정
+        <ul class="subfolder-list" id="subfolder-list" style="display:none;">
+          <li data-folder="month_week1">1주차</li>
+          <li data-folder="month_week2">2주차</li>
+          <li data-folder="month_week3">3주차</li>
+          <li data-folder="month_week4">4주차</li>
+        </ul>
+      </li>
+      <li data-folder="day">하루 일과</li>
+    </ul>
+    <ul class="month-icon-list" id="month-icon-list" style="display:none; margin-top:10px; padding-left:0;">
+      <li data-month="1">1월</li>
+      <li data-month="2">2월</li>
+      <li data-month="3">3월</li>
+      <li data-month="4">4월</li>
+      <li data-month="5">5월</li>
+      <li data-month="6">6월</li>
+      <li data-month="7">7월</li>
+      <li data-month="8">8월</li>
+      <li data-month="9">9월</li>
+      <li data-month="10">10월</li>
+      <li data-month="11">11월</li>
+      <li data-month="12">12월</li>
+    </ul>
+  </div>
+  <main>
+    <div class="note-input-container" id="note-input-area">
+      <textarea id="note-input" placeholder="여기에 메모를 입력하세요"></textarea>
+      <button id="save-note-btn">저장</button>
+    </div>
+    <div id="notes-container"></div>
+    <div id="day-table-container" style="display:none;"></div>
+    <div id="month-calendar-container" style="display:none;"></div>
+  </main>
+  <script>
+    // 폴더별 메모 저장소 (로컬 변수)
+    const notesByFolder = {
+      important: [],
+      month: [],
+      day: [],
+      month_week1: [],
+      month_week2: [],
+      month_week3: [],
+      month_week4: []
+    };
+    let currentFolder = 'important';
+
+    const noteInput = document.getElementById('note-input');
+    const saveBtn = document.getElementById('save-note-btn');
+    const notesContainer = document.getElementById('notes-container');
+    const folderList = document.getElementById('folder-list');
+    const folderLis = folderList.querySelectorAll('li[data-folder]');
+    const monthFolder = document.getElementById('month-folder');
+    const subfolderList = document.getElementById('subfolder-list');
+    const subfolderLis = subfolderList.querySelectorAll('li');
+    const monthIconList = document.getElementById('month-icon-list');
+    const monthCalendarContainer = document.getElementById('month-calendar-container');
+
+    // 드래그 앤 드롭용 변수
+    let dragSrcIdx = null;
+
+    function renderNotes() {
+      const notes = notesByFolder[currentFolder];
+      notesContainer.innerHTML = '';
+      if (!notes || notes.length === 0) {
+        notesContainer.innerHTML = '<div style="color:#aaa;padding:40px;">저장된 메모가 없습니다.</div>';
+      }
+      notes.forEach((note, idx) => {
+        const noteBox = document.createElement('div');
+        noteBox.className = 'note-box';
+        noteBox.setAttribute('draggable', 'true');
+        noteBox.setAttribute('data-idx', idx);
+        noteBox.innerHTML = `
+          <button class="delete-btn" data-idx="${idx}" title="삭제">&times;</button>
+          <div>${note.replace(/\n/g, '<br>')}</div>
+        `;
+        // 드래그 이벤트
+        noteBox.addEventListener('dragstart', function(e) {
+          dragSrcIdx = idx;
+          noteBox.style.opacity = '0.4';
+        });
+        noteBox.addEventListener('dragend', function(e) {
+          noteBox.style.opacity = '';
+        });
+        noteBox.addEventListener('dragover', function(e) {
+          e.preventDefault();
+          noteBox.style.border = '2px dashed #6c63ff';
+        });
+        noteBox.addEventListener('dragleave', function(e) {
+          noteBox.style.border = '';
+        });
+        noteBox.addEventListener('drop', function(e) {
+          e.preventDefault();
+          noteBox.style.border = '';
+          const targetIdx = Number(noteBox.getAttribute('data-idx'));
+          if (dragSrcIdx !== null && dragSrcIdx !== targetIdx) {
+            const moved = notes.splice(dragSrcIdx, 1)[0];
+            notes.splice(targetIdx, 0, moved);
+            renderNotes();
+          }
+          dragSrcIdx = null;
+        });
+        notesContainer.appendChild(noteBox);
+      });
+    }
+
+    function saveNote() {
+      const text = noteInput.value.trim();
+      if (!text) return;
+      notesByFolder[currentFolder].unshift(text);
+      noteInput.value = '';
+      renderNotes();
+    }
+
+    // 저장 버튼 클릭
+    saveBtn.onclick = saveNote;
+
+    // textarea에서 Enter를 누르면 줄바꿈 없이 저장 (Shift+Enter만 줄바꿈)
+    noteInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        saveNote();
+      }
+    });
+
+    // 삭제
+    notesContainer.onclick = function(e) {
+      if (e.target.classList.contains('delete-btn')) {
+        const idx = e.target.getAttribute('data-idx');
+        notesByFolder[currentFolder].splice(idx, 1);
+        renderNotes();
+      }
+    };
+
+    // 하루 일과 시간표용 메모 저장소
+    const daySchedule = Array.from({length: 20}, () => ""); // 5시~24시(1시)까지 20칸
+
+    // 하루 일과 시간표 생성 함수 (셀 클릭 시 입력)
+    function renderDayTable() {
+      const startHour = 5;
+      const endHour = 25; // 1시(=25시)
+      let html = `
+        <div style="max-width:340px;width:100%;margin:0 auto;">
+          <h2 style="margin-top:0;font-size:1.1em;">일일 계획표</h2>
+          <table style="width:100%;border-collapse:collapse;font-size:0.92em;">
+            <thead>
+              <tr>
+                <th style="width:48px;text-align:center;border-bottom:2px solid #ddd;">시간</th>
+                <th style="border-bottom:2px solid #ddd;">일정</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      for(let h=startHour; h<endHour; h++) {
+        const idx = h - startHour;
+        const hourStr = (h<24 ? h : h-24+0) + ":00";
+        html += `
+          <tr>
+            <td style="background:#ffe5d0;text-align:center;border:1px solid #eee;height:22px;padding:2px 0;">${hourStr}</td>
+            <td style="border:1px solid #eee;height:22px;padding:2px 4px;cursor:pointer;" data-hour-idx="${idx}">${daySchedule[idx] ? daySchedule[idx] : ""}</td>
+          </tr>
+        `;
+      }
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+      const container = document.getElementById('day-table-container');
+      container.innerHTML = html;
+
+      // 셀 클릭 시 입력창 표시
+      container.querySelectorAll('td[data-hour-idx]').forEach(cell => {
+        cell.onclick = function() {
+          const idx = Number(cell.getAttribute('data-hour-idx'));
+          const prev = daySchedule[idx] || "";
+          const input = document.createElement('input');
+          input.type = "text";
+          input.value = prev;
+          input.style.width = "95%";
+          input.style.height = "20px";
+          input.style.fontSize = "1em";
+          input.style.border = "1px solid #bbb";
+          input.style.borderRadius = "4px";
+          input.style.padding = "2px 4px";
+          cell.innerHTML = "";
+          cell.appendChild(input);
+          input.focus();
+
+          input.onkeydown = function(e) {
+            if (e.key === "Enter") {
+              daySchedule[idx] = input.value.trim();
+              renderDayTable();
+            }
+          };
+          input.onblur = function() {
+            daySchedule[idx] = input.value.trim();
+            renderDayTable();
+          };
+        };
+      });
+    }
+
+    // 월별 달력 메모 저장소 (연도-월별로 분리)
+    const calendarNotes = {}; // 예: { "2024-7": { "1": "메모", ... } }
+
+    // 달력 셀 생성 함수(메모 표시)
+    function renderCalendarCell(day, notes) {
+      const note = notes[day] ? `<div class="calendar-note" style="margin-top:2px;font-size:0.92em;color:#6c63ff;white-space:pre-line;">${notes[day]}</div>` : "";
+      return `<td data-day="${day}" style="cursor:pointer; position:relative;">
+        <div style="font-weight:600;">${day}</div>${note}
+      </td>`;
+    }
+
+    // 월별 달력 렌더링 함수 (일자 클릭 시 메모 입력)
+    function renderMonthCalendar(year, month) {
+      const key = `${year}-${month}`;
+      if (!calendarNotes[key]) calendarNotes[key] = {};
+      const notes = calendarNotes[key];
+
+      const firstDay = new Date(year, month - 1, 1).getDay(); // 0:일~6:토
+      const lastDate = new Date(year, month, 0).getDate();
+      let html = `<div class="calendar-title">${year}년 ${month}월 MONTHLY PLAN</div>`;
+      html += `<table class="calendar-table"><thead><tr>
+        <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+      </tr></thead><tbody><tr>`;
+      let day = 1;
+      // 빈칸
+      for(let i=0; i<firstDay; i++) html += "<td></td>";
+      for(let i=firstDay; i<7; i++) {
+        html += renderCalendarCell(day++, notes);
+      }
+      html += "</tr>";
+      while(day <= lastDate) {
+        html += "<tr>";
+        for(let i=0; i<7; i++) {
+          if(day > lastDate) html += "<td></td>";
+          else html += renderCalendarCell(day++, notes);
+        }
+        html += "</tr>";
+      }
+      html += "</tbody></table>";
+      monthCalendarContainer.innerHTML = html;
+      monthCalendarContainer.style.display = "block";
+
+      // 셀 클릭 이벤트: 메모 입력
+      monthCalendarContainer.querySelectorAll('td[data-day]').forEach(cell => {
+        cell.onclick = function(e) {
+          // 이미 입력창이 있으면 무시
+          if (cell.querySelector('input')) return;
+          const day = cell.getAttribute('data-day');
+          const prev = notes[day] || "";
+          const input = document.createElement('input');
+          input.type = "text";
+          input.value = prev;
+          input.style.width = "90%";
+          input.style.fontSize = "0.98em";
+          input.style.border = "1px solid #bbb";
+          input.style.borderRadius = "4px";
+          input.style.padding = "2px 4px";
+          cell.querySelector('.calendar-note')?.remove();
+          cell.appendChild(input);
+          input.focus();
+
+          input.onkeydown = function(e) {
+            if (e.key === "Enter") {
+              notes[day] = input.value.trim();
+              renderMonthCalendar(year, month);
+            }
+          };
+          input.onblur = function() {
+            notes[day] = input.value.trim();
+            renderMonthCalendar(year, month);
+          };
+          e.stopPropagation();
+        };
+      });
+    }
+
+    // 폴더 클릭 시 해당 폴더로 전환
+    folderList.onclick = function(e) {
+      const li = e.target.closest('li[data-folder]');
+      if (!li) return;
+
+      // 하위 폴더 토글
+      if (li === monthFolder) {
+        subfolderList.style.display = subfolderList.style.display === 'none' ? 'block' : 'none';
+        // 월 아이콘 표시
+        monthIconList.style.display = 'flex';
+        monthCalendarContainer.style.display = 'none';
+      } else {
+        subfolderList.style.display = 'none';
+        monthIconList.style.display = 'none';
+        monthCalendarContainer.style.display = 'none';
+      }
+
+      // 폴더 전환
+      currentFolder = li.getAttribute('data-folder');
+      folderLis.forEach(li2 => li2.classList.remove('active'));
+      subfolderLis.forEach(subli => subli.classList.remove('active'));
+      li.classList.add('active');
+      renderNotes();
+
+      // 하루 일과 폴더 클릭 시 시간표 표시
+      if (currentFolder === 'day') {
+        renderDayTable();
+        document.getElementById('day-table-container').style.display = 'block';
+        document.getElementById('note-input-area').style.display = 'none';
+        notesContainer.style.display = 'none';
+        monthIconList.style.display = 'none';
+        monthCalendarContainer.style.display = 'none';
+      } else if (currentFolder !== 'month') {
+        document.getElementById('day-table-container').style.display = 'none';
+        document.getElementById('note-input-area').style.display = '';
+        notesContainer.style.display = '';
+      }
+    };
+
+    // 월 아이콘 클릭 시 달력 표시
+    monthIconList.onclick = function(e) {
+      const li = e.target.closest('li[data-month]');
+      if (!li) return;
+      monthIconList.querySelectorAll('li').forEach(li2 => li2.classList.remove('active'));
+      li.classList.add('active');
+      const month = Number(li.getAttribute('data-month'));
+      const year = new Date().getFullYear();
+      renderMonthCalendar(year, month);
+
+      // 하루일과 표 숨기기
+      document.getElementById('day-table-container').style.display = 'none';
+      document.getElementById('note-input-area').style.display = '';
+      notesContainer.style.display = '';
+    };
+
+    renderNotes();
+  </script>
+</body>
+</html>
